@@ -710,7 +710,7 @@ selinit(void)
 int
 x2col(int x)
 {
-	x -= borderpx;
+	x -= borderx;
 	x /= xw.cw;
 
 	return LIMIT(x, 0, term.col-1);
@@ -719,7 +719,7 @@ x2col(int x)
 int
 y2row(int y)
 {
-	y -= borderpx;
+	y -= bordery;
 	y /= xw.ch;
 
 	return LIMIT(y, 0, term.row-1);
@@ -3217,8 +3217,8 @@ xtermclear(int col1, int row1, int col2, int row2)
 {
 	XftDrawRect(xw.draw,
 			&dc.col[IS_SET(MODE_REVERSE) ? defaultfg : defaultbg],
-			borderpx + col1 * xw.cw,
-			borderpx + row1 * xw.ch,
+			borderx + col1 * xw.cw,
+			bordery + row1 * xw.ch,
 			(col2-col1+1) * xw.cw,
 			(row2-row1+1) * xw.ch);
 }
@@ -3248,8 +3248,8 @@ xhints(void)
 	sizeh->width = xw.w;
 	sizeh->height_inc = xw.ch;
 	sizeh->width_inc = xw.cw;
-	sizeh->base_height = 2 * borderpx;
-	sizeh->base_width = 2 * borderpx;
+	sizeh->base_height = 2 * bordery;
+	sizeh->base_width = 2 * borderx;
 	if (xw.isfixed) {
 		sizeh->flags |= PMaxSize | PMinSize;
 		sizeh->min_width = sizeh->max_width = xw.w;
@@ -3464,8 +3464,8 @@ xinit(void)
 	xloadcols();
 
 	/* adjust fixed window geometry */
-	xw.w = 2 * borderpx + term.col * xw.cw;
-	xw.h = 2 * borderpx + term.row * xw.ch;
+	xw.w = 2 * borderx + term.col * xw.cw;
+	xw.h = 2 * bordery + term.row * xw.ch;
 	if (xw.gm & XNegative)
 		xw.l += DisplayWidth(xw.dpy, xw.scr) - xw.w - 2;
 	if (xw.gm & YNegative)
@@ -3553,7 +3553,7 @@ xinit(void)
 int
 xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x, int y)
 {
-	float winx = borderpx + x * xw.cw, winy = borderpx + y * xw.ch, xp, yp;
+	float winx = borderx + x * xw.cw, winy = bordery + y * xw.ch, xp, yp;
 	ushort mode, prevmode = USHRT_MAX;
 	Font *font = &dc.font;
 	int frcflags = FRC_NORMAL;
@@ -3686,7 +3686,7 @@ void
 xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, int y)
 {
 	int charlen = len * ((base.mode & ATTR_WIDE) ? 2 : 1);
-	int winx = borderpx + x * xw.cw, winy = borderpx + y * xw.ch,
+	int winx = borderx + x * xw.cw, winy = bordery + y * xw.ch,
 	    width = charlen * xw.cw;
 	Color *fg, *bg, *temp, revfg, revbg, truefg, truebg;
 	XRenderColor colfg, colbg;
@@ -3776,7 +3776,7 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
 
 	/* Intelligent cleaning up of the borders. */
 	if (x == 0) {
-		xclear(0, (y == 0)? 0 : winy, borderpx,
+		xclear(0, (y == 0)? 0 : winy, borderx,
 			winy + xw.ch + ((y >= term.row-1)? xw.h : 0));
 	}
 	if (x + charlen >= term.col) {
@@ -3784,7 +3784,7 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
 			((y >= term.row-1)? xw.h : (winy + xw.ch)));
 	}
 	if (y == 0)
-		xclear(winx, 0, winx + width, borderpx);
+		xclear(winx, 0, winx + width, bordery);
 	if (y == term.row-1)
 		xclear(winx, winy + xw.ch, winx + width, xw.h);
 
@@ -3894,35 +3894,35 @@ xdrawcursor(void)
 		case 3: /* Blinking Underline */
 		case 4: /* Steady Underline */
 			XftDrawRect(xw.draw, &drawcol,
-					borderpx + curx * xw.cw,
-					borderpx + (term.c.y + 1) * xw.ch - \
+					borderx + curx * xw.cw,
+					bordery + (term.c.y + 1) * xw.ch - \
 						cursorthickness,
 					xw.cw, cursorthickness);
 			break;
 		case 5: /* Blinking bar */
 		case 6: /* Steady bar */
 			XftDrawRect(xw.draw, &drawcol,
-					borderpx + curx * xw.cw,
-					borderpx + term.c.y * xw.ch,
+					borderx + curx * xw.cw,
+					bordery + term.c.y * xw.ch,
 					cursorthickness, xw.ch);
 			break;
 		}
 	} else {
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + curx * xw.cw,
-				borderpx + term.c.y * xw.ch,
+				borderx + curx * xw.cw,
+				bordery + term.c.y * xw.ch,
 				xw.cw - 1, 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + curx * xw.cw,
-				borderpx + term.c.y * xw.ch,
+				borderx + curx * xw.cw,
+				bordery + term.c.y * xw.ch,
 				1, xw.ch - 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + (curx + 1) * xw.cw - 1,
-				borderpx + term.c.y * xw.ch,
+				borderx + (curx + 1) * xw.cw - 1,
+				bordery + term.c.y * xw.ch,
 				1, xw.ch - 1);
 		XftDrawRect(xw.draw, &drawcol,
-				borderpx + curx * xw.cw,
-				borderpx + (term.c.y + 1) * xw.ch - 1,
+				borderx + curx * xw.cw,
+				bordery + (term.c.y + 1) * xw.ch - 1,
 				xw.cw, 1);
 	}
 	oldx = curx, oldy = term.c.y;
@@ -4201,8 +4201,8 @@ cresize(int width, int height)
 	if (height != 0)
 		xw.h = height;
 
-	col = (xw.w - 2 * borderpx) / xw.cw;
-	row = (xw.h - 2 * borderpx) / xw.ch;
+	col = (xw.w - 2 * borderx) / xw.cw;
+	row = (xw.h - 2 * bordery) / xw.ch;
 
 	tresize(col, row);
 	xresize(col, row);
