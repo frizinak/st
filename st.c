@@ -3237,7 +3237,7 @@ xclear(int x1, int y1, int x2, int y2)
 void
 xhints(void)
 {
-	XClassHint class = {opt_class ? opt_class : termname, termname};
+	XClassHint class = {termname, opt_class ? opt_class : termname};
 	XWMHints wm = {.flags = InputHint, .input = 1};
 	XSizeHints *sizeh = NULL;
 
@@ -4329,7 +4329,7 @@ run(void)
 void
 usage(void)
 {
-	die("%s " VERSION " (c) 2010-2015 st engineers\n"
+	die("%s " VERSION " (c) 2010-2016 st engineers\n"
 	"usage: st [-a] [-v] [-c class] [-f font] [-g geometry] [-o file]\n"
 	"          [-i] [-t title] [-T title] [-w windowid] [-e command ...]"
 	" [command ...]\n"
