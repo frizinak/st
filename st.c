@@ -1440,6 +1440,8 @@ ttynew(void)
 	if (openpty(&m, &s, NULL, NULL, &w) < 0)
 		die("openpty failed: %s\n", strerror(errno));
 
+	ttyresize();
+
 	switch (pid = fork()) {
 	case -1:
 		die("fork failed\n");
@@ -3469,7 +3471,7 @@ xinit(void)
 	if (xw.gm & XNegative)
 		xw.l += DisplayWidth(xw.dpy, xw.scr) - xw.w - 2;
 	if (xw.gm & YNegative)
-		xw.t += DisplayWidth(xw.dpy, xw.scr) - xw.h - 2;
+		xw.t += DisplayHeight(xw.dpy, xw.scr) - xw.h - 2;
 
 	/* Events */
 	xw.attrs.background_pixel = dc.col[defaultbg].pixel;
@@ -4329,7 +4331,7 @@ run(void)
 void
 usage(void)
 {
-	die("%s " VERSION " (c) 2010-2015 st engineers\n"
+	die("%s " VERSION " (c) 2010-2016 st engineers\n"
 	"usage: st [-a] [-v] [-c class] [-f font] [-g geometry] [-o file]\n"
 	"          [-i] [-t title] [-T title] [-w windowid] [-e command ...]"
 	" [command ...]\n"
