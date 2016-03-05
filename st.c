@@ -453,9 +453,9 @@ static void cmessage(XEvent *);
 static void cresize(int, int);
 static void resize(XEvent *);
 static void focus(XEvent *);
-static void brelease(XEvent *);
-static void bpress(XEvent *);
-static void bmotion(XEvent *);
+// static void brelease(XEvent *);
+// static void bpress(XEvent *);
+// static void bmotion(XEvent *);
 static void propnotify(XEvent *);
 static void selnotify(XEvent *);
 static void selclear(XEvent *);
@@ -496,9 +496,9 @@ static void (*handler[LASTEvent])(XEvent *) = {
 	[Expose] = expose,
 	[FocusIn] = focus,
 	[FocusOut] = focus,
-	[MotionNotify] = bmotion,
-	[ButtonPress] = bpress,
-	[ButtonRelease] = brelease,
+	//[MotionNotify] = bmotion,
+	//[ButtonPress] = bpress,
+	//[ButtonRelease] = brelease,
 /*
  * Uncomment if you want the selection to disappear when you select something
  * different in another window.
@@ -941,55 +941,55 @@ mousereport(XEvent *e)
 	ttywrite(buf, len);
 }
 
-void
-bpress(XEvent *e)
-{
-	struct timespec now;
-	MouseShortcut *ms;
-
-	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
-		mousereport(e);
-		return;
-	}
-
-	for (ms = mshortcuts; ms < mshortcuts + LEN(mshortcuts); ms++) {
-		if (e->xbutton.button == ms->b
-				&& match(ms->mask, e->xbutton.state)) {
-			ttysend(ms->s, strlen(ms->s));
-			return;
-		}
-	}
-
-	if (e->xbutton.button == Button1) {
-		clock_gettime(CLOCK_MONOTONIC, &now);
-
-		/* Clear previous selection, logically and visually. */
-		selclear(NULL);
-		sel.mode = SEL_EMPTY;
-		sel.type = SEL_REGULAR;
-		sel.oe.x = sel.ob.x = x2col(e->xbutton.x);
-		sel.oe.y = sel.ob.y = y2row(e->xbutton.y);
-
-		/*
-		 * If the user clicks below predefined timeouts specific
-		 * snapping behaviour is exposed.
-		 */
-		if (TIMEDIFF(now, sel.tclick2) <= tripleclicktimeout) {
-			sel.snap = SNAP_LINE;
-		} else if (TIMEDIFF(now, sel.tclick1) <= doubleclicktimeout) {
-			sel.snap = SNAP_WORD;
-		} else {
-			sel.snap = 0;
-		}
-		selnormalize();
-
-		if (sel.snap != 0)
-			sel.mode = SEL_READY;
-		tsetdirt(sel.nb.y, sel.ne.y);
-		sel.tclick2 = sel.tclick1;
-		sel.tclick1 = now;
-	}
-}
+// void
+// bpress(XEvent *e)
+// {
+// 	struct timespec now;
+// 	MouseShortcut *ms;
+// 
+// 	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
+// 		mousereport(e);
+// 		return;
+// 	}
+// 
+// 	for (ms = mshortcuts; ms < mshortcuts + LEN(mshortcuts); ms++) {
+// 		if (e->xbutton.button == ms->b
+// 				&& match(ms->mask, e->xbutton.state)) {
+// 			ttysend(ms->s, strlen(ms->s));
+// 			return;
+// 		}
+// 	}
+// 
+// 	if (e->xbutton.button == Button1) {
+// 		clock_gettime(CLOCK_MONOTONIC, &now);
+// 
+// 		/* Clear previous selection, logically and visually. */
+// 		selclear(NULL);
+// 		sel.mode = SEL_EMPTY;
+// 		sel.type = SEL_REGULAR;
+// 		sel.oe.x = sel.ob.x = x2col(e->xbutton.x);
+// 		sel.oe.y = sel.ob.y = y2row(e->xbutton.y);
+// 
+// 		/*
+// 		 * If the user clicks below predefined timeouts specific
+// 		 * snapping behaviour is exposed.
+// 		 */
+// 		if (TIMEDIFF(now, sel.tclick2) <= tripleclicktimeout) {
+// 			sel.snap = SNAP_LINE;
+// 		} else if (TIMEDIFF(now, sel.tclick1) <= doubleclicktimeout) {
+// 			sel.snap = SNAP_WORD;
+// 		} else {
+// 			sel.snap = 0;
+// 		}
+// 		selnormalize();
+// 
+// 		if (sel.snap != 0)
+// 			sel.mode = SEL_READY;
+// 		tsetdirt(sel.nb.y, sel.ne.y);
+// 		sel.tclick2 = sel.tclick1;
+// 		sel.tclick1 = now;
+// 	}
+// }
 
 char *
 getsel(void)
@@ -1266,50 +1266,50 @@ xsetsel(char *str, Time t)
 		selclear(0);
 }
 
-void
-brelease(XEvent *e)
-{
-	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
-		mousereport(e);
-		return;
-	}
+// void
+// brelease(XEvent *e)
+// {
+// 	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
+// 		mousereport(e);
+// 		return;
+// 	}
+// 
+// 	if (e->xbutton.button == Button2) {
+// 		selpaste(NULL);
+// 	} else if (e->xbutton.button == Button1) {
+// 		if (sel.mode == SEL_READY) {
+// 			getbuttoninfo(e);
+// 			selcopy(e->xbutton.time);
+// 		} else
+// 			selclear(NULL);
+// 		sel.mode = SEL_IDLE;
+// 		tsetdirt(sel.nb.y, sel.ne.y);
+// 	}
+// }
 
-	if (e->xbutton.button == Button2) {
-		selpaste(NULL);
-	} else if (e->xbutton.button == Button1) {
-		if (sel.mode == SEL_READY) {
-			getbuttoninfo(e);
-			selcopy(e->xbutton.time);
-		} else
-			selclear(NULL);
-		sel.mode = SEL_IDLE;
-		tsetdirt(sel.nb.y, sel.ne.y);
-	}
-}
-
-void
-bmotion(XEvent *e)
-{
-	int oldey, oldex, oldsby, oldsey;
-
-	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
-		mousereport(e);
-		return;
-	}
-
-	if (!sel.mode)
-		return;
-
-	sel.mode = SEL_READY;
-	oldey = sel.oe.y;
-	oldex = sel.oe.x;
-	oldsby = sel.nb.y;
-	oldsey = sel.ne.y;
-	getbuttoninfo(e);
-
-	if (oldey != sel.oe.y || oldex != sel.oe.x)
-		tsetdirt(MIN(sel.nb.y, oldsby), MAX(sel.ne.y, oldsey));
-}
+// void
+// bmotion(XEvent *e)
+// {
+// 	int oldey, oldex, oldsby, oldsey;
+// 
+// 	if (IS_SET(MODE_MOUSE) && !(e->xbutton.state & forceselmod)) {
+// 		mousereport(e);
+// 		return;
+// 	}
+// 
+// 	if (!sel.mode)
+// 		return;
+// 
+// 	sel.mode = SEL_READY;
+// 	oldey = sel.oe.y;
+// 	oldex = sel.oe.x;
+// 	oldsby = sel.nb.y;
+// 	oldsey = sel.ne.y;
+// 	getbuttoninfo(e);
+// 
+// 	if (oldey != sel.oe.y || oldex != sel.oe.x)
+// 		tsetdirt(MIN(sel.nb.y, oldsby), MAX(sel.ne.y, oldsey));
+// }
 
 void
 die(const char *errstr, ...)
