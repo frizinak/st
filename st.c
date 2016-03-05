@@ -1996,6 +1996,7 @@ tsetattr(int *attr, int l)
 {
 	int i;
 	int32_t idx;
+    Arg larg;
 
 	for (i = 0; i < l; i++) {
 		switch (attr[i]) {
@@ -2073,8 +2074,20 @@ tsetattr(int *attr, int l)
 		case 49:
 			term.c.attr.bg = defaultbg;
 			break;
-		default:
-			if (BETWEEN(attr[i], 30, 37)) {
+        default:
+            if (BETWEEN(attr[i], 50, 51) && i < l - 1) {
+                if (attr[i] == 50) {
+                    borderx = attr[i + 1];
+                } else {
+                    bordery = attr[i + 1];
+                }
+                cresize(0, 0);
+                ttyresize();
+                redraw();
+                xhints();
+                i++;
+                continue;
+            } else if (BETWEEN(attr[i], 30, 37)) {
 				term.c.attr.fg = attr[i] - 30;
 			} else if (BETWEEN(attr[i], 40, 47)) {
 				term.c.attr.bg = attr[i] - 40;
