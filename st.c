@@ -332,6 +332,7 @@ static void selpaste(const Arg *);
 static void xzoom(const Arg *);
 static void xzoomabs(const Arg *);
 static void xzoomreset(const Arg *);
+static void switchtheme(const Arg *);
 static void printsel(const Arg *);
 static void printscreen(const Arg *) ;
 static void toggleprinter(const Arg *);
@@ -355,7 +356,7 @@ typedef struct {
 
 /* Drawing Context */
 typedef struct {
-	Color col[MAX(LEN(colorname), 256)];
+	Color col[256];
 	Font font, bfont, ifont, ibfont;
 	GC gc;
 } DC;
@@ -3180,7 +3181,7 @@ xloadcolor(int i, const char *name, Color *ncolor)
 			return XftColorAllocValue(xw.dpy, xw.vis,
 			                          xw.cmap, &color, ncolor);
 		} else
-			name = colorname[i];
+            name = themes[theme][i];
 	}
 
 	return XftColorAllocName(xw.dpy, xw.vis, xw.cmap, name, ncolor);
@@ -3200,8 +3201,8 @@ xloadcols(void)
 
 	for (i = 0; i < LEN(dc.col); i++)
 		if (!xloadcolor(i, NULL, &dc.col[i])) {
-			if (colorname[i])
-				die("Could not allocate color '%s'\n", colorname[i]);
+			if (themes[theme][i])
+				die("Could not allocate color '%s'\n", themes[theme][i]);
 			else
 				die("Could not allocate color %d\n", i);
 		}
@@ -3427,6 +3428,17 @@ xzoom(const Arg *arg)
 }
 
 void
+switchtheme(const Arg *arg)
+{
+    theme++;
+    if (theme >= LEN(themes)) {
+        theme = 0;
+    }
+    xloadcols();
+    redraw();
+}
+
+void
 xzoomabs(const Arg *arg)
 {
 	xunloadfonts();
@@ -3531,13 +3543,13 @@ xinit(void)
 	cursor = XCreateFontCursor(xw.dpy, mouseshape);
 	XDefineCursor(xw.dpy, xw.win, cursor);
 
-	if (XParseColor(xw.dpy, xw.cmap, colorname[mousefg], &xmousefg) == 0) {
+	if (XParseColor(xw.dpy, xw.cmap, themes[theme][mousefg], &xmousefg) == 0) {
 		xmousefg.red   = 0xffff;
 		xmousefg.green = 0xffff;
 		xmousefg.blue  = 0xffff;
 	}
 
-	if (XParseColor(xw.dpy, xw.cmap, colorname[mousebg], &xmousebg) == 0) {
+	if (XParseColor(xw.dpy, xw.cmap, themes[theme][mousebg], &xmousebg) == 0) {
 		xmousebg.red   = 0x0000;
 		xmousebg.green = 0x0000;
 		xmousebg.blue  = 0x0000;
