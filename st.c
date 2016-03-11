@@ -356,7 +356,7 @@ typedef struct {
 
 /* Drawing Context */
 typedef struct {
-	Color col[256];
+	Color col[MAXCOLORS];
 	Font font, bfont, ifont, ibfont;
 	GC gc;
 } DC;

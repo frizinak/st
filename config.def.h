@@ -71,7 +71,8 @@ static unsigned int tabspaces = 8;
 /* Terminal colors (16 first used in escape sequence) */
 
 int theme = 0
-static const char *themes[1][258] = {
+#define MAXCOLORS 258
+static const char *themes[1][MAXCOLORS] = {
     {
         /* 8 normal colors */
         "black",
